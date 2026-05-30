@@ -16,4 +16,5 @@ export async function register({email,password,contact,fullname , isSeller}){
         fullname,
         isSeller
     })
+    return responce.data
 }
