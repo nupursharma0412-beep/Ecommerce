@@ -1,6 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useAuth } from "../hook/useAuth"
 import {useNavigate , Link, Links} from "react-router"
+import ContinueWIthGoogle from "../components/ContinueWIthGoogle";
 
 
 const Register = () => {
@@ -43,11 +44,11 @@ const Register = () => {
       className="min-h-screen bg-[#F8F6F1] flex items-center justify-center p-4 lg:p-8"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      <div className="w-full lg:w-[92%] lg:h-[88vh] max-w-[1700px] bg-white rounded-[40px] border border-[#EEE7D8] shadow-[0_25px_80px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="w-full lg:w-[92%] lg:h-[99vh] max-w-[1700px] bg-white rounded-[40px] border border-[#EEE7D8] shadow-[0_25px_80px_rgba(0,0,0,0.05)]">
         <div className="grid lg:grid-cols-2 h-full">
 
           {/* LEFT SIDE */}
-          <div className="flex items-center px-8 lg:px-20 py-12 lg:py-0 border-b lg:border-b-0 lg:border-r border-[#F1ECE0]">
+          <div className="flex items-center px-8 lg:px-20 py-8 lg:py-0 border-b lg:border-b-0 lg:border-r border-[#F1ECE0]">
             <div className="max-w-xl">
               <p className="uppercase tracking-[0.4em] text-xs text-[#B79A4A] font-medium mb-6">
                 Premium Fashion House
@@ -201,8 +202,11 @@ const Register = () => {
                     >
                       Register as a Seller
                     </label>
-                  </div>
+
+                 
                 </div>
+                 
+                  </div>
 
                 {/* BUTTON */}
                 <button
@@ -211,7 +215,7 @@ const Register = () => {
                 >
                   Create Account
                 </button>
-
+                  <ContinueWIthGoogle/>
                 {/* LOGIN */}
                 <p className="text-center text-[14px] text-[#71717A]">
                   Already have an account?

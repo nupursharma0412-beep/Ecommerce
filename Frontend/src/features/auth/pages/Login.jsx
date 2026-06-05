@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hook/useAuth";
 import { useNavigate , Link} from "react-router";
+import ContinueWIthGoogle from "../components/ContinueWIthGoogle";
 
 const Login = () => {
   const { handleLogin } = useAuth();
@@ -150,6 +151,7 @@ const Login = () => {
                   Sign In
                 </button>
 
+                  <ContinueWIthGoogle />
                 {/* REGISTER */}
                 <p className="text-center text-[14px] text-[#71717A]">
                   Don't have an account?
