@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useProduct } from '../hook/useProduct'
 import { useNavigate } from 'react-router'
-import Loading from '../../auth/components/Loading'
 const CreateProduct = () => {
     const { handleCreateProduct } = useProduct()
  const navigate = useNavigate()
@@ -278,7 +277,7 @@ const CreateProduct = () => {
                             disabled={loading}
                             className="w-full h-14 px-6 bg-[#B79A4A] text-white font-medium rounded-2xl hover:bg-[#9d8340] disabled:bg-[#CCCCCC] disabled:cursor-not-allowed transition-colors text-[15px] font-semibold"
                         >
-                            {loading ? <Loading /> : 'Create Product'}
+                            {loading ? 'Creating Product...' : 'Create Product'}
                         </button>
                     </div>
                 </form>
