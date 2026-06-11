@@ -206,7 +206,7 @@ const EmptyCart = ({ navigate }) => (
 // ── Main Cart ─────────────────────────────────────────────────────────────────
 const Cart = () => {
   const cart     = useSelector(state => state.cart)
-  const { handleGetCart , handleIncreamentCartItem} = useCart()
+  const { handleGetCart , handleIncreamentCartItem , handleDecreamentCartItem , handleRemoveCartItem} = useCart()
   const navigate = useNavigate()
 
   const [quantities, setQuantities] = useState({})
@@ -309,14 +309,23 @@ const Cart = () => {
                         {/* Qty + remove */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, flexWrap: 'wrap', gap: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', border: `1.5px solid #e6e2da`, borderRadius: 10, overflow: 'hidden' }}>
-                            <button className="qty-btn" style={{ borderRight: '1px solid #e6e2da' }} onClick={() => changeQty(productId, -1)} aria-label="Decrease">−</button>
+                            <button className="qty-btn" style={{ borderRight: '1px solid #e6e2da' }} onClick={(e) => {
+                              e.preventDefault()
+                              handleDecreamentCartItem({productId , variantId})
+                            }} aria-label="Decrease">−</button>
                             <span style={{ width: 40, textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#0f0f0f', userSelect: 'none' }}>{qty}</span>
                             <button className="qty-btn" style={{ borderLeft: '1px solid #e6e2da' }} onClick={(e) =>{
                               e.preventDefault()
                               handleIncreamentCartItem({productId , variantId})
                                } }aria-label="Increase">+</button>
                           </div>
-                          <button className="remove-btn">Remove</button>
+                          <button className="remove-btn" onClick={
+                            (e)=>{
+                              e.preventDefault()
+                              handleRemoveCartItem({productId , variantId})
+                              
+                            }
+                          }>Remove</button>
                         </div>
                       </div>
                     </div>

@@ -2,60 +2,63 @@ import cartModel from '../models/cart.model.js'
 import productModel from '../models/product.model.js'
 import { stockOfVariant } from '../dao/product.dao.js'
 
-export const addToCart = async (req,res)=>{
+export const addToCart = async (req, res) => {
 
-    const {productId, variantId} = req.params
+    const { productId, variantId } = req.params
 
-    const {quantity} = req.body
+    const { quantity } = req.body
 
-    const product = await productModel.findOne({_id:productId, "variants._id":variantId})
+    const product = await productModel.findOne({ _id: productId, "variants._id": variantId })
 
-    if(!product){
-        return res.status(404).json({message:"Product or variant not found",
-            success:false
+    if (!product) {
+        return res.status(404).json({
+            message: "Product or variant not found",
+            success: false
         })
     }
 
     const stock = await stockOfVariant(productId, variantId)
 
-    const cart = (await cartModel.findOne({user:req.user._id})) || await cartModel.create({user:req.user._id})
+    const cart = (await cartModel.findOne({ user: req.user._id })) || await cartModel.create({ user: req.user._id })
 
-    const isProductAlreadyInCart =cart.items.some(item => item.product.toString() === productId && item.variant?.toString() === variantId)
-//cart.items.find(
+    const isProductAlreadyInCart = cart.items.some(item => item.product.toString() === productId && item.variant?.toString() === variantId)
+    //cart.items.find(
 
-    if(isProductAlreadyInCart){
-      
-        const quantityInCart = cart.items.find(item=>item.product.toString() === productId && item.variant.toString() === variantId).quantity
+    if (isProductAlreadyInCart) {
 
-        if( quantityInCart + quantity > stock){
-            return res.status(400).json({message:`Only ${stock - quantityInCart} items left in stock and you already have ${quantityInCart} items in your cart`,
-                success:false
+        const quantityInCart = cart.items.find(item => item.product.toString() === productId && item.variant.toString() === variantId).quantity
+
+        if (quantityInCart + quantity > stock) {
+            return res.status(400).json({
+                message: `Only ${stock - quantityInCart} items left in stock and you already have ${quantityInCart} items in your cart`,
+                success: false
             })
         }
-        await cartModel.findOneAndUpdate({_id:cart._id, "items.product":productId, "items.variant":variantId},{
-            $inc:{"items.$.quantity":quantity}
-        },{new:true})
+        await cartModel.findOneAndUpdate({ _id: cart._id, "items.product": productId, "items.variant": variantId }, {
+            $inc: { "items.$.quantity": quantity }
+        }, { new: true })
 
     }
 
-    if(quantity > stock){
-        return res.status(400).json({message:`Only ${stock} items left in stock`,
-            success:false
+    if (quantity > stock) {
+        return res.status(400).json({
+            message: `Only ${stock} items left in stock`,
+            success: false
         })
     }
 
 
     cart.items.push({
-        product:productId,
-        variant:variantId,
+        product: productId,
+        variant: variantId,
         quantity,
-        price:product.price
+        price: product.price
     })
 
     await cart.save()
     return res.status(200).json({
-        message:"Product added to cart",
-        success:true,
+        message: "Product added to cart",
+        success: true,
         cart
     })
 
@@ -63,61 +66,132 @@ export const addToCart = async (req,res)=>{
 }
 
 
-export const getCart = async (req,res)=>{
+export const getCart = async (req, res) => {
 
     const user = req.user
 
-    const cart = await cartModel.findOne({user :user._id}).populate("items.product").populate("items.product.variant")
-    
+    const cart = await cartModel.findOne({ user: user._id }).populate("items.product").populate("items.product.variant")
+
     return res.status(200).json({
-        message:"Cart fetched successfully",
-        success:true,
+        message: "Cart fetched successfully",
+        success: true,
         cart
     })
 }
 
 
-export const increamentCartItemQuantity = async(req, res)=>{
-    const {productId , variantId} = req.params
+export const increamentCartItemQuantity = async (req, res) => {
+    const { productId, variantId } = req.params
 
     const product = await productModel.findOne({
-        _id:productId,
-        "variants._id":variantId
+        _id: productId,
+        "variants._id": variantId
     })
-    if(!product){
+    if (!product) {
         return res.status(404).json({
-            message:"Product or variant is not found",
-            success:false
+            message: "Product or variant is not found",
+            success: false
         })
     }
 
     const stock = await stockOfVariant(productId, variantId)
-    const cart = await cartModel.findOne({user:req.user._id})
+    const cart = await cartModel.findOne({ user: req.user._id })
 
-    if(!cart){
+    if (!cart) {
         return res.status(404).json({
-            message:"Cart not found",
-            success:false
+            message: "Cart not found",
+            success: false
         })
     }
 
-    const itemQuantityInCart = cart.items.find(item=>item.product.toString() === productId && item.variant.toString() === variantId)?.quantity || 0
+    const itemQuantityInCart = cart.items.find(item => item.product.toString() === productId && item.variant.toString() === variantId)?.quantity || 0
 
-    if(itemQuantityInCart + 1 > stock){
+    if (itemQuantityInCart + 1 > stock) {
         return res.status(400).json({
-            message:`Only ${stock - itemQuantityInCart} items left in stock and you already have ${itemQuantityInCart} items in your cart`,
-            success:false
+            message: `Only ${stock - itemQuantityInCart} items left in stock and you already have ${itemQuantityInCart} items in your cart`,
+            success: false
         })
     }
 
-    await cartModel.findOneAndUpdate({_id:cart._id, "items.product":productId, "items.variant":variantId},{
-        $inc:{"items.$.quantity":1}
-    },{new:true})
+    await cartModel.findOneAndUpdate({ _id: cart._id, "items.product": productId, "items.variant": variantId }, {
+        $inc: { "items.$.quantity": 1 }
+    }, { new: true })
 
     return res.status(200).json({
-        message:"Cart item quantity increased",
-        success:true
+        message: "Cart item quantity increased",
+        success: true
     })
 
+
+}
+
+
+export const decrementCartItemQuantity = async (req, res) => {
+    const { productId, variantId } = req.params
+    const product = await productModel.findOne({
+        _id: productId,
+        "variants._id": variantId
+    })
+
+    if (!product) {
+        return res.status(404).json({
+            message: "Product or variant is not found",
+            success: false
+        })
+    }
+
+    const cart = await cartModel.findOne({ user: req.user._id })
+    if (!cart) {
+        return res.status(404).json({
+            message: "Cart not found",
+            success: false
+        })
+    }
+    const stock = await stockOfVariant(productId, variantId)
+    const itemQuantityInCart = cart.items.find(item => item.product.toString() === productId && item.variant.toString() === variantId)?.quantity || 0
+
+    if (itemQuantityInCart - 1 < 0) {
+        return res.status(400).json({
+            message: `You have only ${itemQuantityInCart} items in your cart`,
+            success: false
+        })
+    }
+
+    await cartModel.findOneAndUpdate({ _id: cart._id, "items.product": productId, "items.variant": variantId }, {
+        $inc: { "items.$.quantity": -1 }
+    }, { new: true })
+
+    return res.status(200).json({
+        message: "Cart item quantity decreased",
+        success: true
+    })
+}
+
+export const removeCartItem = async (req, res) => {
+    const { productId, variantId } = req.params
+
+    const product = await productModel.findOne({
+        _id: productId,
+        "variants._id": variantId
+    })
+    if (!product) {
+        return res.status(404).json({
+            message: "Product or variant is not found",
+            success: false
+        })
+    }
+    await cartModel.findOneAndUpdate({ user: req.user._id }, {
+        $pull: {
+            items: {
+                product: productId,
+                variant: variantId
+            }
+        }
+    })
+
+    return res.status(200).json({
+        message: "Item removed from cart",
+        success: true
+    })
 
 }
