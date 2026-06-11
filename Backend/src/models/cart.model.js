@@ -9,13 +9,13 @@ const cartScehma = new mongoose.Schema({
     },
     items:[
         {
-            products:{
+            product:{
                 type:mongoose.Schema.Types.ObjectId,
                 ref:'product',
                 required:true
-            },varient:{
+            },variant:{
                 type:mongoose.Schema.Types.ObjectId,
-                ref:'product.varient'
+                ref:'product.variant'
             },quantity:{
                 type:Number,
                 default:1
