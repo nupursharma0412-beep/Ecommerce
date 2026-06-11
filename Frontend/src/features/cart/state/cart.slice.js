@@ -18,34 +18,61 @@ const cartSlice = createSlice({
             increamentCartItem: (state, action) => {
                 const { productId, variantId } = action.payload
 
-                const item = state.items.find(
-                    item => item.product._id === productId && item.variant === variantId
-                )
+                // Match items with or without variant
+                const item = state.items.find(item => {
+                    const itemProductId = item.product?._id || item.product
+                    const itemVariantId = item.variant
+                    
+                    if (itemProductId !== productId) return false
+                    
+                    // If neither has variant, match
+                    if (!variantId && !itemVariantId) return true
+                    // If both have variant, compare
+                    if (variantId && itemVariantId) return itemVariantId.toString() === variantId
+                    
+                    return false
+                })
 
                 if (item) item.quantity += 1
             },
             decreamentCartItem: (state, action) => {
                 const { productId, variantId } = action.payload
 
-                const itemIndex = state.items.findIndex(
-                    item => item.product._id === productId && item.variant === variantId
-                )
+                const itemIndex = state.items.findIndex(item => {
+                    const itemProductId = item.product?._id || item.product
+                    const itemVariantId = item.variant
+                    
+                    if (itemProductId !== productId) return false
+                    
+                    if (!variantId && !itemVariantId) return true
+                    if (variantId && itemVariantId) return itemVariantId.toString() === variantId
+                    
+                    return false
+                })
 
                 if (itemIndex !== -1) {
                     const item = state.items[itemIndex]
                     if (item.quantity > 1) {
                         item.quantity -= 1
                     } else {
-                        // Remove the item when quantity would become 0
                         state.items.splice(itemIndex, 1)
                     }
                 }
             },
             removeCartItem: (state, action) => {
-                const { productId, variantId } = action.payload 
-                state.items = state.items.filter(
-                    item => !(item.product._id === productId && item.variant === variantId)
-                )
+                const { productId, variantId } = action.payload
+                
+                state.items = state.items.filter(item => {
+                    const itemProductId = item.product?._id || item.product
+                    const itemVariantId = item.variant
+                    
+                    if (itemProductId !== productId) return true
+                    
+                    if (!variantId && !itemVariantId) return false
+                    if (variantId && itemVariantId) return itemVariantId.toString() !== variantId
+                    
+                    return true
+                })
             }
             
         

@@ -9,9 +9,12 @@ const Login = lazy(() => import('../features/auth/pages/Login'))
 const CreateProduct = lazy(() => import('../features/products/pages/CreateProduct'))
 const Dashboard = lazy(() => import('../features/products/pages/Dashboard'))
 const Home = lazy(() => import('../features/products/pages/Home'))
+const Products = lazy(() => import('../features/products/pages/Products'))
+const CategoryProducts = lazy(() => import('../features/products/pages/CategoryProducts'))
 const ProductDetailed = lazy(() => import('../features/products/pages/ProductDetailed'))
 const SellerProductDetials = lazy(() => import('../features/products/pages/SellerProductDetials'))
 const Cart = lazy(() => import('../features/cart/pages/Cart'))
+const Wishlist = lazy(() => import('../features/wishlist/pages/Wishlist'))
 
 const LazyLoad = ({ children }) => (
   <Suspense fallback={<Loader />}>
@@ -30,13 +33,25 @@ export const routes = createBrowserRouter([
     {
         element: <AppLayout />,
         children: [
-
             {
                 path: "/",
                 element: <LazyLoad><Home /></LazyLoad>
-            }, {
+            },
+            {
+                path: "/products",
+                element: <LazyLoad><Products /></LazyLoad>
+            },
+            {
+                path: "/category/:category",
+                element: <LazyLoad><CategoryProducts /></LazyLoad>
+            },
+            {
                 path: "/product/:productId",
                 element: <LazyLoad><ProductDetailed /></LazyLoad>
+            },
+            {
+                path: "/wishlist",
+                element: <LazyLoad><Protected><Wishlist /></Protected></LazyLoad>
             },
             {
                 path: "/cart",

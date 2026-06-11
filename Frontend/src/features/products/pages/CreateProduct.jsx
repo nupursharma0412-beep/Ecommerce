@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import { useProduct } from '../hook/useProduct'
 import { useNavigate } from 'react-router'
+
+const CATEGORIES = ['Shirts', 'Shoes', 'Watches', 'Electronics', 'Clothing', 'Accessories', 'Home & Living', 'Beauty', 'Sports', 'Books', 'Other']
+const GENDERS = ['Men', 'Women', 'Unisex', 'Kids']
+
 const CreateProduct = () => {
     const { handleCreateProduct } = useProduct()
  const navigate = useNavigate()
@@ -10,6 +14,9 @@ const CreateProduct = () => {
         description: '',
         priceAmount: '',
         priceCurrency: 'INR',
+        category: 'Other',
+        gender: 'Unisex',
+        quantity: '1',
         images: []
     })
     const [imagePreviews, setImagePreviews] = useState([])
@@ -92,6 +99,9 @@ const CreateProduct = () => {
             submitData.append('description', formData.description)
             submitData.append('priceAmount', formData.priceAmount)
             submitData.append('priceCurrency', formData.priceCurrency)
+            submitData.append('category', formData.category)
+            submitData.append('gender', formData.gender)
+            submitData.append('quantity', formData.quantity)
 
             // Append images
             formData.images.forEach((image, index) => {
@@ -130,8 +140,12 @@ const CreateProduct = () => {
                     </p>
                 </div>
 
-                {/* Alert Messages */}
-
+                {/* Error Alert */}
+                {error && (
+                    <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Product Title */}
@@ -166,8 +180,58 @@ const CreateProduct = () => {
                         />
                     </div>
 
-                    {/* Price Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Category & Gender */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label htmlFor="category" className="block mb-3 text-sm text-[#444] font-medium">
+                                Category
+                            </label>
+                            <select
+                                id="category"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
+                                className="w-full h-14 rounded-2xl border border-[#E7E1D2] bg-white px-5 text-[15px] outline-none transition-all focus:border-[#B79A4A] focus:ring-4 focus:ring-[#B79A4A]/10 appearance-none"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B79A4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 0.75rem center',
+                                    backgroundSize: '1.5em 1.5em',
+                                    paddingRight: '2.5rem'
+                                }}
+                            >
+                                {CATEGORIES.map((cat) => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="gender" className="block mb-3 text-sm text-[#444] font-medium">
+                                Gender
+                            </label>
+                            <select
+                                id="gender"
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleInputChange}
+                                className="w-full h-14 rounded-2xl border border-[#E7E1D2] bg-white px-5 text-[15px] outline-none transition-all focus:border-[#B79A4A] focus:ring-4 focus:ring-[#B79A4A]/10 appearance-none"
+                                style={{
+                                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B79A4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 0.75rem center',
+                                    backgroundSize: '1.5em 1.5em',
+                                    paddingRight: '2.5rem'
+                                }}
+                            >
+                                {GENDERS.map((gen) => (
+                                    <option key={gen} value={gen}>{gen}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Price Section & Quantity */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div className="md:col-span-2">
                             <label htmlFor="priceAmount" className="block mb-3 text-sm text-[#444] font-medium">
                                 Price Amount
@@ -206,11 +270,25 @@ const CreateProduct = () => {
                                 <option value="USD">USD</option>
                                 <option value="EUR">EUR</option>
                                 <option value="GBP">GBP</option>
-                                
                                 <option value="JPY">JPY</option>
                                 <option value="AUD">AUD</option>
                                 <option value="CAD">CAD</option>
                             </select>
+                        </div>
+                        <div>
+                            <label htmlFor="quantity" className="block mb-3 text-sm text-[#444] font-medium">
+                                Quantity
+                            </label>
+                            <input
+                                type="number"
+                                id="quantity"
+                                name="quantity"
+                                value={formData.quantity}
+                                onChange={handleInputChange}
+                                placeholder="1"
+                                min="0"
+                                className="w-full h-14 rounded-2xl border border-[#E7E1D2] bg-white px-5 text-[15px] outline-none transition-all focus:border-[#B79A4A] focus:ring-4 focus:ring-[#B79A4A]/10"
+                            />
                         </div>
                     </div>
 

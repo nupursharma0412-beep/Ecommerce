@@ -19,6 +19,25 @@ const productSchema = new mongoose.Schema({
         type: priceSchema,
         required: true
     },
+    // New fields for enhanced product management
+    category: {
+        type: String,
+        required: true,
+        enum: ['Shirts', 'Shoes', 'Watches', 'Electronics', 'Clothing', 'Accessories', 'Home & Living', 'Beauty', 'Sports', 'Books', 'Other'],
+        default: 'Other'
+    },
+    gender: {
+        type: String,
+        required: true,
+        enum: ['Men', 'Women', 'Unisex', 'Kids'],
+        default: 'Unisex'
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        default: 1,
+        min: 0
+    },
     images: [
         {
             url: {

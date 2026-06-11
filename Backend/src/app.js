@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import authRouter from '../src/routes/auth.routes.js'
 import cartRouter from './routes/cart.routes.js';
 import productRouter from '../src/routes/product.routes.js'
+import wishlistRouter from '../src/routes/wishlist.routes.js'
 import cors from 'cors'
 import passport from 'passport'
 import { Strategy as GoogleStrategy} from 'passport-google-oauth20';
@@ -36,6 +37,7 @@ passport.use(new GoogleStrategy({
 app.use("/api/auth" , authRouter)
 app.use("/api/products" , productRouter)
 app.use("/api/cart" , cartRouter)
+app.use("/api/wishlist" , wishlistRouter)
 
 
 export default app; 

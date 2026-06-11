@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
 import { useProduct } from '../hook/useProduct';
 import { useCart } from '../../cart/hooks/useCart';
+import { useWishlist } from '../../wishlist/hooks/useWishlist';
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const GOLD      = '#b8973a';
@@ -109,6 +111,21 @@ const STYLES = `
   .cta-outline:active:not(:disabled) { transform: scale(.97); }
   .cta-outline:disabled { border-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
 
+  .wishlist-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    border: 2px solid #e6e2da;
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, background .2s, transform .1s;
+    flex-shrink: 0;
+  }
+  .wishlist-btn:hover { border-color: ${GOLD}; transform: scale(1.04); }
+  .wishlist-btn:active { transform: scale(.95); }
+  .wishlist-btn.wishlisted { border-color: ${GOLD}; background: ${GOLD_LIGHT}; }
+
   .perk-card {
     display: flex; flex-direction: column; align-items: center; text-align: center;
     gap: 6px;
@@ -150,6 +167,11 @@ const CartIcon  = () => (
   </Icon>
 );
 const BoltIcon  = () => <Icon><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Icon>;
+const HeartIcon = ({ filled }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? GOLD : 'none'} stroke={filled ? GOLD : '#9ca3af'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
 const TruckIcon = () => (
   <Icon size={14} stroke={GOLD} sw={1.5}>
     <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
@@ -200,6 +222,8 @@ const ProductDetail = () => {
   const navigate                  = useNavigate();
   const { handleGetProductById }  = useProduct();
   const { handleAddItem }         = useCart();
+  const user                      = useSelector(state => state.auth.user);
+  const { handleToggleWishlist, isProductWishlisted, isProductToggling, handleFetchWishlist } = useWishlist();
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
   async function fetchProductDetails() {
@@ -211,7 +235,10 @@ const ProductDetail = () => {
     }
   }
 
-  useEffect(() => { fetchProductDetails(); }, [productId]);
+  useEffect(() => { 
+    fetchProductDetails(); 
+    if (user) handleFetchWishlist();
+  }, [productId]);
 
   useEffect(() => {
     if (product?.variants?.length > 0) {
@@ -261,11 +288,15 @@ const ProductDetail = () => {
     }
   };
 
+  // Check wishlist status
+  const productIsWishlisted = product ? isProductWishlisted(product._id) : false;
+  const productIsToggling = product ? isProductToggling(product._id) : false;
+
   if (!product) return <Loader />;
 
   const displayImages = (activeVariant?.images?.length ? activeVariant.images : product.images?.length ? product.images : [{ url: '/placeholder.png' }]);
   const displayPrice  = activeVariant?.price?.amount ? activeVariant.price : product.price;
-  const inStock       = (activeVariant?.stock ?? product?.stock ?? 0) > 0;
+  const inStock       = (activeVariant?.stock ?? product?.quantity ?? 0) > 0;
   const rating        = product.rating || 0;
   const hasImgs       = displayImages.length > 1;
 
@@ -276,6 +307,14 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     handleAddItem({ productId: product._id, variantId: activeVariant?._id ?? null });
     navigate('/checkout');
+  };
+
+  const handleWishlistToggle = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    handleToggleWishlist(product._id, activeVariant?._id ?? null);
   };
 
   return (
@@ -370,6 +409,20 @@ const ProductDetail = () => {
                   {product.description}
                 </p>
 
+                {/* Category & Gender badges */}
+                <div className="fade-up-3" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                  {product.category && (
+                    <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', background: GOLD_LIGHT, color: GOLD_DARK, padding: '4px 12px', borderRadius: 999 }}>
+                      {product.category}
+                    </span>
+                  )}
+                  {product.gender && (
+                    <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#f0ede6', color: '#374151', padding: '4px 12px', borderRadius: 999 }}>
+                      {product.gender}
+                    </span>
+                  )}
+                </div>
+
                 {/* Attribute selectors */}
                 {Object.entries(availableAttributes).map(([attrName, values]) => (
                   <div key={attrName} className="fade-up-3" style={{ marginBottom: 20 }}>
@@ -389,10 +442,10 @@ const ProductDetail = () => {
                 ))}
 
                 {/* Stock badge */}
-                {activeVariant?.stock !== undefined && (
+                {(activeVariant?.stock !== undefined || product?.quantity !== undefined) && (
                   <div className="fade-up-3" style={{ marginBottom: 20 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: activeVariant.stock > 0 ? '#15803d' : '#dc2626' }}>
-                      {activeVariant.stock > 0 ? `${activeVariant.stock} in stock` : 'Out of stock'}
+                    <span style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: ((activeVariant?.stock ?? product?.quantity) > 0) ? '#15803d' : '#dc2626' }}>
+                      {((activeVariant?.stock ?? product?.quantity) > 0) ? `${activeVariant?.stock ?? product?.quantity} in stock` : 'Out of stock'}
                     </span>
                   </div>
                 )}
@@ -402,7 +455,7 @@ const ProductDetail = () => {
                   {[
                     { label: 'SKU',      value: String(product._id).slice(-6).toUpperCase() },
                     { label: 'Category', value: product.category || 'Fashion' },
-                    { label: 'Listed',   value: new Date(product.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) },
+                    { label: 'Gender',   value: product.gender || 'Unisex' },
                     { label: 'Currency', value: displayPrice?.currency },
                   ].map(({ label, value }) => (
                     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0ede6', paddingBottom: 10 }}>
@@ -427,6 +480,23 @@ const ProductDetail = () => {
               {/* CTAs */}
               <div className="fade-up-4" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', gap: 12 }}>
+                  {/* Wishlist Button */}
+                  <button 
+                    className={`wishlist-btn ${productIsWishlisted ? 'wishlisted' : ''}`}
+                    onClick={handleWishlistToggle}
+                    disabled={productIsToggling}
+                    title={productIsWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                  >
+                    {productIsToggling ? (
+                      <svg className="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke={GOLD} strokeWidth="4" />
+                        <path className="opacity-75" fill={GOLD} d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : (
+                      <HeartIcon filled={productIsWishlisted} />
+                    )}
+                  </button>
+
                   <button className="cta-primary" disabled={!inStock} onClick={handleAddToCart}>
                     <CartIcon /> Add to Cart
                   </button>
