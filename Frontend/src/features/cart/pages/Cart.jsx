@@ -267,7 +267,7 @@ const Cart = () => {
                   const stock        = variant?.stock
 
                   return (
-                    <div key={productId} className="cart-item">
+                    <div key={`${productId}-${variantId}`} className="cart-item">
                       {/* Image */}
                       <div style={{ flexShrink: 0, width: 'clamp(90px, 12vw, 140px)', aspectRatio: '4/5', borderRadius: 12, overflow: 'hidden', background: '#f0ede6' }}>
                         {imageUrl

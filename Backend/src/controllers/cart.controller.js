@@ -34,9 +34,15 @@ export const addToCart = async (req, res) => {
                 success: false
             })
         }
-        await cartModel.findOneAndUpdate({ _id: cart._id, "items.product": productId, "items.variant": variantId }, {
+        const updatedCart = await cartModel.findOneAndUpdate({ _id: cart._id, "items.product": productId, "items.variant": variantId }, {
             $inc: { "items.$.quantity": quantity }
         }, { new: true })
+
+        return res.status(200).json({
+            message: "Product quantity updated in cart",
+            success: true,
+            cart: updatedCart
+        })
 
     }
 
@@ -119,7 +125,7 @@ export const increamentCartItemQuantity = async (req, res) => {
 
     return res.status(200).json({
         message: "Cart item quantity increased",
-        success: true
+        success: true 
     })
 
 
