@@ -1,7 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import Loading from './Loading'
+
 import { Navigate } from 'react-router'
+import Loader from '../../shared/components/Loader'
 
 const Protected = ({ children , role="buyer" }) => {
     const user = useSelector(state => state.auth.user)
@@ -9,7 +10,7 @@ const Protected = ({ children , role="buyer" }) => {
 
     const loading = useSelector(state => state.auth.loading)
     if (loading) {
-        return <Loading />
+        return <Loader />
     }
     if (!user) {
         return <Navigate to="/login" />

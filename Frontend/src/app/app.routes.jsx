@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router'
 import Protected from '../features/auth/components/Protected'
 import AppLayout from './AppLayout'
+import Loader from '../features/shared/components/Loader'
 
 const Register = lazy(() => import('../features/auth/pages/Register'))
 const Login = lazy(() => import('../features/auth/pages/Login'))
@@ -13,21 +14,7 @@ const SellerProductDetials = lazy(() => import('../features/products/pages/Selle
 const Cart = lazy(() => import('../features/cart/pages/Cart'))
 
 const LazyLoad = ({ children }) => (
-  <Suspense fallback={
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      fontSize: 13,
-      letterSpacing: '0.12em',
-      textTransform: 'uppercase',
-      color: '#9ca3af',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      Loading…
-    </div>
-  }>
+  <Suspense fallback={<Loader />}>
     {children}
   </Suspense>
 )
