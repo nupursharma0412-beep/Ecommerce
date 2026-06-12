@@ -2,8 +2,9 @@ import axios from 'axios'
 
 
 const authApiInstance = axios.create({
-    baseURL:`${import.meta.env.VITE_API_URL || ""}/api/auth`,
-    withCredentials:true
+    baseURL:`https://clothy-backend-djl7.onrender.com/api/auth`,
+    
+    defaultwithCredentials:true
 })
 
 

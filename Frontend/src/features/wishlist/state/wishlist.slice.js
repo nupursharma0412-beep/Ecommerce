@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import * as wishlistApi from '../services/wishlist.api'
+import { toast } from 'react-toastify'
 
 export const fetchWishlist = createAsyncThunk(
     'wishlist/fetchWishlist',
@@ -74,14 +75,17 @@ const wishlistSlice = createSlice({
                     if (!state.wishlistedIds.includes(productId)) {
                         state.wishlistedIds.push(productId)
                     }
+                    toast.success("Added to wishlist")
                 } else {
                     state.wishlistedIds = state.wishlistedIds.filter(id => id !== productId)
+                    toast.success("Removed from wishlist")
                 }
             })
             .addCase(toggleWishlistItem.rejected, (state, action) => {
                 const productId = action.meta.arg.productId
                 state.togglingIds = state.togglingIds.filter(id => id !== productId)
                 state.error = action.payload
+                toast.error(action.payload || "Failed to toggle wishlist")
             })
     }
 })

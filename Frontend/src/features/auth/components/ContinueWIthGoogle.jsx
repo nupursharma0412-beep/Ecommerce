@@ -3,7 +3,7 @@ import React from 'react'
 const ContinueWIthGoogle = () => {
     return (
         <a
-            href="/api/auth/google"
+            href={`https://clothy-backend-djl7.onrender.com/api/auth/google`}
             role="button"
             aria-label="Continue with Google"
             className="inline-flex items-center gap-3 h-10 px-4 bg-white text-gray-700 border border-gray-300 rounded-md shadow-sm text-sm font-medium hover:shadow-md active:translate-y-[0.5px] focus:outline-none focus:ring-2 focus:ring-blue-300"

@@ -43,7 +43,7 @@ export const routes = createBrowserRouter([
             },
             {
                 path: "/category/:category",
-                element: <LazyLoad><CategoryProducts /></LazyLoad>
+                element: <LazyLoad><CategoryProducts  /></LazyLoad>
             },
             {
                 path: "/product/:productId",
@@ -51,11 +51,11 @@ export const routes = createBrowserRouter([
             },
             {
                 path: "/wishlist",
-                element: <LazyLoad><Protected><Wishlist /></Protected></LazyLoad>
+                element: <LazyLoad><Protected ><Wishlist /></Protected></LazyLoad>
             },
             {
                 path: "/cart",
-                element: <LazyLoad><Protected><Cart /></Protected></LazyLoad>
+                element: <LazyLoad><Protected ><Cart /></Protected></LazyLoad>
             },
             {
                 path: "/seller",

@@ -1,13 +1,16 @@
 ﻿import React, { useState } from "react";
 import { useAuth } from "../hook/useAuth"
+import { useSelector } from "react-redux";
 import {useNavigate , Link, Links} from "react-router"
 import ContinueWIthGoogle from "../components/ContinueWIthGoogle";
+import Loader from "../../shared/components/Loader";
 
 
 const Register = () => {
 
   const { handleRegister } = useAuth()
   const navigate = useNavigate()
+  const loading = useSelector((state) => state.auth.loading)
 
   const [formData, setFormData] = useState({
     fullname: '',
@@ -38,6 +41,8 @@ const Register = () => {
     navigate("/");
     console.log("Register form submitted", formData);
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div
